@@ -1,0 +1,6 @@
+langchain
+langgraph
+python-dotenv
+playwright
+PyYAML
+pydantic
