@@ -1,0 +1,15 @@
+app:
+  name: "game-dev-agents"
+  version: "0.1.0"
+  env: "development"
+
+workspace:
+  root_dir: "./workspace"
+  allowed_paths:
+    - "./workspace"
+    - "./project_templates"
+
+execution:
+  max_iterations: 25
+  timeout_seconds: 300
+  enable_sandbox: true

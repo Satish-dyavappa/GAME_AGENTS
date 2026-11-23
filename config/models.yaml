@@ -1,0 +1,45 @@
+default_provider: "kilo"
+
+providers:
+  kilo:
+    model: "kilo-auto/free"
+    base_url: "https://api.kilo.ai/api/gateway/v1/"
+    api_key_env: "KILO_API_KEY"
+    temperature: 0.2
+    max_tokens: 4096
+    free_models:
+      - "kilo-auto/free"
+      - "openrouter/free"
+      - "nvidia/nemotron-3-ultra-550b-a55b:free"
+
+  openrouter:
+    model: "qwen/qwen-2.5-coder-32b-instruct:free"
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+    temperature: 0.2
+    max_tokens: 4096
+    free_models:
+      - "qwen/qwen-2.5-coder-32b-instruct:free"
+      - "meta-llama/llama-3.3-70b-instruct:free"
+      - "deepseek/deepseek-r1:free"
+      - "google/gemini-2.0-flash-exp:free"
+
+  gemini:
+    model: "gemini-2.5-flash"
+    temperature: 0.2
+    max_tokens: 8192
+
+  openai:
+    model: "gpt-4o"
+    temperature: 0.2
+    max_tokens: 4096
+
+  anthropic:
+    model: "claude-3-7-sonnet"
+    temperature: 0.2
+    max_tokens: 4096
+
+  ollama:
+    model: "deepseek-coder:6.7b"
+    base_url: "http://localhost:11434"
+    temperature: 0.2
