@@ -22,6 +22,15 @@ from game_agents.core import (
     ToolResult,
     default_model_router,
 )
+from game_agents.engines import (
+    BaseEngineAdapter,
+    EngineRegistry,
+    PhaserAdapter,
+    ThreejsAdapter,
+    UnityAdapter,
+    UnrealAdapter,
+    default_engine_registry,
+)
 from game_agents.tools import ToolRegistry, default_tool_registry
 
 __all__ = [
@@ -41,6 +50,14 @@ __all__ = [
     # Tools
     "ToolRegistry",
     "default_tool_registry",
+    # Engines
+    "BaseEngineAdapter",
+    "EngineRegistry",
+    "default_engine_registry",
+    "PhaserAdapter",
+    "UnityAdapter",
+    "UnrealAdapter",
+    "ThreejsAdapter",
     # Agents
     "SupervisorAgent",
     "PlannerAgent",
