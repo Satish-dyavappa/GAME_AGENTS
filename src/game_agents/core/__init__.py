@@ -10,6 +10,12 @@ from game_agents.core.contracts import (
     TaskStatus,
     ToolResult,
 )
+from game_agents.core.routing import (
+    ApiKeyLoader,
+    ModelRouter,
+    ModelSelection,
+    default_model_router,
+)
 
 __all__ = [
     "Status",
@@ -20,4 +26,8 @@ __all__ = [
     "ToolResult",
     "EngineType",
     "ProjectManifest",
+    "ApiKeyLoader",
+    "ModelRouter",
+    "ModelSelection",
+    "default_model_router",
 ]
