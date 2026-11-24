@@ -32,6 +32,15 @@ from game_agents.engines import (
     default_engine_registry,
 )
 from game_agents.tools import ToolRegistry, default_tool_registry
+from game_agents.workflows import (
+    BaseWorkflow,
+    BugFixWorkflow,
+    FeatureDevelopmentWorkflow,
+    ProjectAnalysisWorkflow,
+    WorkflowResult,
+    WorkflowStatus,
+    WorkflowStepResult,
+)
 
 __all__ = [
     # Contracts
@@ -66,4 +75,12 @@ __all__ = [
     "DebuggerAgent",
     "CodeReviewerAgent",
     "QAAgent",
+    # Workflows
+    "BaseWorkflow",
+    "WorkflowResult",
+    "WorkflowStatus",
+    "WorkflowStepResult",
+    "ProjectAnalysisWorkflow",
+    "FeatureDevelopmentWorkflow",
+    "BugFixWorkflow",
 ]
