@@ -9,3 +9,7 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+#Game develoment office
+node_modules
+workspaces
