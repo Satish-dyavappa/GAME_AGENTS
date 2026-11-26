@@ -3,7 +3,7 @@
 import json
 from abc import ABC
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
 from game_agents.agents.base.agent_config import AgentConfig
@@ -27,10 +27,19 @@ class BaseAgent(ABC):
         config: AgentConfig,
         tool_registry: ToolRegistry | None = None,
         model_router: ModelRouter | None = None,
+        on_event: Callable[[str, dict[str, Any]], None] | None = None,
     ) -> None:
         self.config = config
         self.tool_registry = tool_registry or default_tool_registry
         self.model_router = model_router or default_model_router
+        self.on_event = on_event
+
+    def _emit(self, event_type: str, payload: dict[str, Any]) -> None:
+        if self.on_event:
+            try:
+                self.on_event(event_type, payload)
+            except Exception:
+                pass
 
     def _get_allowed_tools(self) -> list[Any]:
         """Collect LangChain-compatible tools permitted for this agent."""
@@ -77,8 +86,8 @@ class BaseAgent(ABC):
         except Exception:
             pass
 
-        # Add active working providers as fallbacks (kilo, openrouter)
-        for prov in ["kilo", "openrouter"]:
+        # Add active working providers as fallbacks (kilo, nvidia, openrouter)
+        for prov in ["kilo", "nvidia", "openrouter"]:
             if not any(c.provider == prov for c in candidates):
                 creds = ApiKeyLoader.get_all_credentials().get(prov)
                 if creds and creds["available"]:
@@ -102,6 +111,7 @@ class BaseAgent(ABC):
         last_error = None
         for sel in candidates:
             try:
+                self._emit("agent_start", {"task": task.title, "provider": sel.provider, "model": sel.model})
                 llm = self.model_router.get_chat_model(selection=sel)
                 llm_with_tools = llm.bind_tools(tools) if tools else llm
                 messages = list(messages_init)
@@ -124,21 +134,43 @@ class BaseAgent(ABC):
                         tool_args = tc.get("args", {})
                         call_id = tc.get("id", f"call_{iterations}")
 
+                        self._emit("tool_call", {"tool": tool_name, "args": tool_args})
                         tool_instance = self.tool_registry.get(tool_name)
                         if tool_instance:
                             tool_res = tool_instance(**tool_args)
                             content = tool_res.output if tool_res.success else f"ERROR: {tool_res.error}"
+                            self._emit(
+                                "tool_result",
+                                {"tool": tool_name, "success": tool_res.success, "output": content[:240]},
+                            )
                             if tool_name == "write_file" and "path" in tool_args:
                                 files_created.add(str(tool_args["path"]))
                             elif tool_name == "edit_file" and "path" in tool_args:
                                 files_modified.add(str(tool_args["path"]))
                         else:
                             content = f"Error: Tool '{tool_name}' is not recognized or not available."
+                            self._emit("tool_result", {"tool": tool_name, "success": False, "output": content})
 
                         messages.append(ToolMessage(content=str(content), tool_call_id=call_id))
 
                 if not final_output:
-                    final_output = "Task iteration limit reached without explicit final response."
+                    # Force one final summary response without tools so findings aren't lost
+                    messages.append(
+                        HumanMessage(
+                            content="You have reached the tool call limit. Summarize your findings and final answer now without calling any more tools."
+                        )
+                    )
+                    summary_msg = llm.invoke(messages)
+                    final_output = (
+                        summary_msg.content
+                        if isinstance(summary_msg.content, str)
+                        else str(summary_msg.content)
+                    )
+
+                self._emit(
+                    "agent_finish",
+                    {"success": True, "files_created": list(files_created), "files_modified": list(files_modified)},
+                )
 
                 result = AgentResult(
                     task_id=task.id,

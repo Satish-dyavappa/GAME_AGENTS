@@ -47,6 +47,10 @@ class ApiKeyLoader:
     """Loads and validates API credentials across all supported sites."""
 
     @staticmethod
+    def get_nvidia_key() -> str | None:
+        return os.getenv("NVIDIA_API_KEY")
+
+    @staticmethod
     def get_kilo_key() -> str | None:
         return os.getenv("KILO_API_KEY")
 
@@ -74,6 +78,11 @@ class ApiKeyLoader:
     def get_all_credentials(cls) -> dict[str, dict[str, Any]]:
         """Return a summary of all known providers and whether their keys are present."""
         return {
+            "nvidia": {
+                "available": bool(cls.get_nvidia_key()),
+                "base_url": os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+                "default_model": os.getenv("NVIDIA_MODEL", "nvidia/nemotron-3-ultra-550b-a55b"),
+            },
             "kilo": {
                 "available": bool(cls.get_kilo_key()),
                 "base_url": os.getenv("KILO_BASE_URL", "https://api.kilo.ai/api/gateway/v1/"),
@@ -145,6 +154,24 @@ class ModelRouter:
             )
 
         text = f"{task.title} {task.description}".lower()
+
+        # Primary: Always use Kilo AI models for all agents & tasks when KILO_API_KEY is available
+        if "kilo" in available and ApiKeyLoader.get_kilo_key():
+            is_high = task.priority == TaskPriority.CRITICAL or any(
+                kw in text for kw in ["architect", "system design", "refactor", "planning"]
+            )
+            model_name = (
+                os.getenv("LARGE_LLM_MODEL", "openrouter/free")
+                if is_high
+                else os.getenv("KILO_MODEL", "kilo-auto/free")
+            )
+            return ModelSelection(
+                provider="kilo",
+                model=model_name,
+                base_url=os.getenv("KILO_BASE_URL", "https://api.kilo.ai/api/gateway/v1/"),
+                api_key=ApiKeyLoader.get_kilo_key() or "",
+                reason=f"All-Kilo routing active ({model_name}).",
+            )
 
         # 1. Complex Architecture / Multi-Agent Planning / Hard Bugfix (Needs deep reasoning)
         is_high_reasoning = (

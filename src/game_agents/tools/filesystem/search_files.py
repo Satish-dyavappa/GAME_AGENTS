@@ -29,11 +29,12 @@ class SearchFilesTool(BaseTool):
         if not root_dir.exists() or not root_dir.is_dir():
             return ToolResult(tool_name=self.name, success=False, error=f"Directory not found: {directory}")
 
+        ignored_dirs = {"node_modules", "__pycache__", "dist", "build", ".venv", ".git", "Library", "Temp"}
         matches: list[str] = []
         try:
             for path in root_dir.rglob(pattern):
-                # Skip hidden directories like .git
-                if any(part.startswith(".") for part in path.parts):
+                # Skip hidden directories and heavy build/dependency folders
+                if any(part.startswith(".") or part in ignored_dirs for part in path.parts):
                     continue
 
                 if path.is_file():

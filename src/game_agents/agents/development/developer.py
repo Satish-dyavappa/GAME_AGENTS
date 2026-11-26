@@ -40,5 +40,6 @@ class DeveloperAgent(BaseAgent):
                 "search_docs",
             ],
             temperature=0.2,
+            max_iterations=40,
         )
         super().__init__(config=config, **kwargs)

@@ -1,6 +1,14 @@
 default_provider: "kilo"
 
 providers:
+  nvidia:
+    model: "nvidia/nemotron-3-ultra-550b-a55b"
+    fast_model: "nvidia/nemotron-3.5-lightning-30b-a3b"
+    base_url: "https://integrate.api.nvidia.com/v1"
+    api_key_env: "NVIDIA_API_KEY"
+    temperature: 0.2
+    max_tokens: 4096
+
   kilo:
     model: "kilo-auto/free"
     base_url: "https://api.kilo.ai/api/gateway/v1/"

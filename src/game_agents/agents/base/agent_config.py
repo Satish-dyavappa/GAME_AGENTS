@@ -12,5 +12,5 @@ class AgentConfig(BaseModel):
     tools: list[str] = Field(default_factory=list, description="Names of tools this agent is permitted to execute")
     model_provider: str | None = Field(default=None, description="Optional override for model provider")
     model_name: str | None = Field(default=None, description="Optional override for model name")
-    max_iterations: int = Field(default=15, description="Max tool execution iterations before forcing completion")
+    max_iterations: int = Field(default=25, description="Max tool execution iterations before forcing completion")
     temperature: float = Field(default=0.2, description="Sampling temperature")

@@ -256,7 +256,10 @@ class FeatureDevelopmentWorkflow(BaseWorkflow):
             f"Rules & Skills:\n{state.get('skills_and_rules', '')}",
         ]
         if debug_notes:
-            desc_parts.append(f"IMPORTANT - Fix these Debugger Findings from previous attempt:\n{debug_notes}")
+            desc_parts.append(
+                f"IMPORTANT - Fix ALL remaining errors identified by Debugger/QA:\n{debug_notes}\n\n"
+                "Apply every fix using `edit_file` / `write_file`, then run the build/test command via `execute_command` to confirm zero errors."
+            )
 
         task = Task(
             title=f"Develop: {state['user_request'][:50]}",
@@ -343,10 +346,11 @@ class FeatureDevelopmentWorkflow(BaseWorkflow):
         manifest = ProjectManifest(**state["manifest"])
         attempts = state.get("debug_attempts", 0) + 1
         task = Task(
-            title=f"Debug Failures (Attempt {attempts})",
+            title=f"Debug & Fix Failures (Attempt {attempts})",
             description=(
                 f"QA reported failures in '{state['project_path']}':\n{state.get('qa_report', '')}\n\n"
-                "Diagnose the root cause, fix any issues or provide exact fix instructions for the Developer."
+                "Diagnose the root cause AND apply fixes directly using `edit_file` / `write_file` where possible. "
+                "List any remaining steps clearly so DeveloperAgent can finish and verify."
             ),
             engine=manifest.engine.value,
             priority=TaskPriority.CRITICAL,

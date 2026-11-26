@@ -31,6 +31,7 @@ class QAAgent(BaseAgent):
                 "browser_screenshot",
                 "browser_click",
                 "browser_console_logs",
+                "list_files",
                 "read_file",
                 "execute_command",
             ],

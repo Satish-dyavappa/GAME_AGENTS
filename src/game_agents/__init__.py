@@ -32,6 +32,7 @@ from game_agents.engines import (
     default_engine_registry,
 )
 from game_agents.tools import ToolRegistry, default_tool_registry
+from game_agents.interfaces.cli import main
 from game_agents.workflows import (
     BaseWorkflow,
     BugFixWorkflow,
@@ -83,4 +84,6 @@ __all__ = [
     "ProjectAnalysisWorkflow",
     "FeatureDevelopmentWorkflow",
     "BugFixWorkflow",
+    # CLI
+    "main",
 ]

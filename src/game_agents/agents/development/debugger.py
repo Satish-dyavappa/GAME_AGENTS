@@ -36,5 +36,6 @@ class DebuggerAgent(BaseAgent):
                 "search_docs",
             ],
             temperature=0.1,
+            max_iterations=40,
         )
         super().__init__(config=config, **kwargs)
