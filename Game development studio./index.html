@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NebulaForge — 3D Game Development Studio</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="studio-canvas"></canvas>
+
+    <!-- Crosshair -->
+    <div id="crosshair" aria-hidden="true"></div>
+
+    <!-- Top Studio Header & Team Directory -->
+    <header id="hud-top">
+      <div class="hud-left-group">
+        <button class="studio-badge" id="open-active-list-btn" title="View Active & Waiting Employees">
+          <span class="pulse-dot"></span>
+          <div style="text-align:left">
+            <div class="studio-name">GAME_AGENTS STUDIO</div>
+            <div class="studio-sub" id="studio-sub">
+              <span id="active-count">4</span> Active · <span id="pending-count">3</span> Need Input
+            </div>
+          </div>
+        </button>
+
+        <button class="hud-pill-btn" id="open-token-graph-btn" title="View Live Token Usage Graph">
+          📊 Token Graph
+        </button>
+      </div>
+
+      <nav id="team-nav" aria-label="Studio Teams">
+        <!-- Populated by JS -->
+      </nav>
+    </header>
+
+    <!-- Bottom Controls Hint -->
+    <div id="controls-hint">
+      <span><kbd>Click</kbd> Look / Select</span>
+      <span><kbd>W A S D</kbd> Walk Anywhere</span>
+      <span><kbd>Shift</kbd> Sprint</span>
+      <span><kbd>E</kbd> Interact</span>
+      <span><kbd>1-4</kbd> Visit Team</span>
+    </div>
+
+    <!-- Proximity Prompt -->
+    <div id="interact-prompt" class="hidden">
+      <div class="prompt-key">E</div>
+      <div class="prompt-text">
+        <div id="prompt-name">Employee Name</div>
+        <div id="prompt-role">Role · Project</div>
+      </div>
+      <span id="prompt-alert" class="prompt-alert hidden">NEEDS INPUT</span>
+    </div>
+
+    <!-- POPUP 1: Individual Employee Laptop & AI Agent Terminal -->
+    <div id="laptop-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="laptop-frame">
+        <div class="laptop-bezel">
+          <div class="laptop-camera-dot"></div>
+          <div class="laptop-header">
+            <div class="emp-info">
+              <span class="team-pill" id="modal-team-pill">Team</span>
+              <h2 id="modal-emp-name">Employee Name</h2>
+              <p id="modal-emp-role">Role — Project</p>
+            </div>
+            <div class="modal-actions">
+              <span class="agent-status-badge" id="modal-agent-status">● AI AGENT ACTIVE</span>
+              <button class="close-btn" data-close-modal title="Close (Esc)">✕ Close</button>
+            </div>
+          </div>
+
+          <div class="laptop-workspace">
+            <!-- Left: Live Laptop Screen -->
+            <div class="laptop-screen-col">
+              <div class="laptop-screen-wrapper">
+                <canvas id="inspector-canvas" width="960" height="560"></canvas>
+              </div>
+              <div class="laptop-footer">
+                <div class="task-box">
+                  <span class="label">CURRENT TASK:</span>
+                  <span id="modal-task">Working on feature...</span>
+                </div>
+                <div class="project-box">
+                  <span class="label">PROJECT:</span>
+                  <span id="modal-project">Game Title</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: AI Agent Input & Comms Console -->
+            <aside class="agent-console">
+              <div class="console-title">
+                <span>AI AGENT TERMINAL</span>
+                <span class="console-sub">Give direction or answer prompt</span>
+              </div>
+
+              <div class="agent-chat-log" id="agent-chat-log"></div>
+
+              <div class="quick-replies" id="quick-replies"></div>
+
+              <form class="agent-input-form" id="agent-input-form">
+                <input
+                  type="text"
+                  id="agent-input"
+                  placeholder="Type instruction or feedback for this agent..."
+                  autocomplete="off"
+                />
+                <button type="submit" id="agent-send-btn">Send</button>
+              </form>
+            </aside>
+          </div>
+        </div>
+        <div class="laptop-base-lip"></div>
+      </div>
+    </div>
+
+    <!-- POPUP 2: Active & Waiting Employees List -->
+    <div id="active-list-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="popup-card">
+        <div class="popup-header">
+          <div>
+            <h2>Active Employees & AI Agents</h2>
+            <p id="active-list-subtitle">8 Active Working · 4 Waiting for Input</p>
+          </div>
+          <div class="popup-header-actions">
+            <div class="filter-tabs" id="active-filter-tabs">
+              <button class="filter-tab active" data-filter="all">All (7)</button>
+              <button class="filter-tab" data-filter="active">Active Working</button>
+              <button class="filter-tab" data-filter="waiting">Needs Input</button>
+            </div>
+            <button class="close-btn" data-close-modal>✕ Close</button>
+          </div>
+        </div>
+
+        <div class="emp-directory-grid" id="emp-directory-grid"></div>
+      </div>
+    </div>
+
+    <!-- POPUP 3: Live Token Usage Graph -->
+    <div id="token-graph-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="popup-card">
+        <div class="popup-header">
+          <div>
+            <h2>Live Token Usage by Employee</h2>
+            <p id="token-graph-subtitle">Real-time AI agent token consumption across all 4 teams</p>
+          </div>
+          <div class="popup-header-actions">
+            <span class="token-total-pill" id="tv-total-tokens">Total: 0k tokens</span>
+            <button class="close-btn" data-close-modal>✕ Close</button>
+          </div>
+        </div>
+
+        <div class="token-chart-box">
+          <canvas id="tv-token-canvas" width="960" height="340"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
