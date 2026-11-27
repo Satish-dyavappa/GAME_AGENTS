@@ -1,15 +1,27 @@
 ---
 name: unity-performance
-description: Unity C# performance optimization, component caching, physics loop hygiene, and GC avoidance.
+description: Diagnose and fix FPS drops, GC spikes, and physics jitter in Unity C# projects. Use when profiling Unity frame time, MonoBehaviour Update() loops, or missing .meta files.
 ---
 
 # Unity Performance Skill
 
-1. **Cache Component References**:
-   - Call `GetComponent<T>()` in `Awake()` and store in private fields—never inside `Update()`.
-2. **Use `FixedUpdate()` for Physics**:
-   - Apply `Rigidbody` / `Rigidbody2D` forces and velocities in `FixedUpdate()`, while reading input in `Update()`.
-3. **Avoid String & LINQ Allocations in `Update()`**:
-   - Cache `WaitForSeconds`, use `StringBuilder` for HUD text, and avoid LINQ queries in per-frame loops.
-4. **Reference Docs**:
-   - See `references/gc-allocation-guide.md` for zero-GC C# patterns.
+## Goal
+Eliminate per-frame GC allocations and heavy `Update()` bottlenecks without changing gameplay behavior.
+
+## When to use
+- Frame rate stutters caused by Garbage Collection spikes
+- Heavy `GetComponent` or LINQ calls inside `Update()`
+- Physics jitter or missing `.meta` references
+
+## Workflow
+1. Inspect MonoBehaviour scripts for `GetComponent`, `FindObjectOfType`, or string/LINQ allocations inside `Update()`.
+2. Cache component references in `Awake()`.
+3. Move `Rigidbody` / `Rigidbody2D` velocity and force logic into `FixedUpdate()`.
+4. Run `unity_check_meta_files` to verify all `Assets/` have valid `.meta` files.
+
+## Rules
+- Never call `GameObject.Find` or `GetComponent<T>()` inside `Update()` or `FixedUpdate()`.
+- Prefer `ObjectPool<T>` and `NonAlloc` physics APIs for projectiles and VFX.
+
+## Reference
+For zero-allocation C# patterns, read `references/gc-allocation-guide.md`.

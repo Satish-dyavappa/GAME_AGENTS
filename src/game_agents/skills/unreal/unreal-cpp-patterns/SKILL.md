@@ -1,14 +1,22 @@
 ---
 name: unreal-cpp-patterns
-description: Unreal Engine 5 C++ best practices, UPROPERTY GC safety, delegates, and Tick optimization.
+description: Enforce Unreal Engine 5 C++ memory safety, reflection macros, and Tick optimization. Use when writing or reviewing Unreal C++ Actors, Components, or .uproject modules.
 ---
 
 # Unreal Engine C++ Patterns Skill
 
-1. **Reflection & GC Safety**:
-   - Always mark `UObject*` member pointers with `UPROPERTY()` so Unreal's garbage collector tracks them.
-   - Use `TObjectPtr<T>` in header files for UE5.
-2. **Naming Conventions**:
-   - `A` prefix for `AActor` subclasses, `U` for `UObject`/`UActorComponent`, `F` for structs, `E` for enums, `I` for interfaces.
-3. **Avoid Unnecessary `Tick()`**:
-   - Set `PrimaryActorTick.bCanEverTick = false;` when an actor can use timers (`FTimerHandle`) or event delegates instead.
+## Goal
+Write crash-free, GC-safe Unreal Engine C++ code that exposes cleanly to Blueprints and minimizes per-frame `Tick()` overhead.
+
+## When to use
+- Creating or reviewing `AActor`, `UActorComponent`, or `UObject` C++ classes
+- Debugging dangling pointer crashes or Blueprint exposure issues
+
+## Workflow
+1. Inspect `.uproject` via `unreal_inspect_uproject` to confirm engine version and modules.
+2. Verify all `UObject*` / `TObjectPtr<T>` member variables use `UPROPERTY()`.
+3. Disable `PrimaryActorTick.bCanEverTick` unless per-frame updates are strictly required.
+
+## Rules
+- Follow Unreal prefixes strictly: `A` (Actor), `U` (UObject/Component), `F` (Struct), `E` (Enum), `I` (Interface).
+- Prefer `FTimerHandle` and event delegates over polling in `Tick()`.

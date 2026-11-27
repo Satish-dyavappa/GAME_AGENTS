@@ -1,13 +1,23 @@
 ---
 name: clean-code-testing
-description: Global standards for clean modular code, build verification, and safe non-blocking QA testing.
+description: Enforce clean build verification, minimal diffs, and non-blocking QA test execution across all engines. Use during code review, debugging, and QA verification.
 ---
 
-# Clean Code & Verification Skill
+# Clean Code & Testing Skill
 
-1. **Always Verify Builds**:
-   - After writing or editing code, run the project's build/typecheck command (`npm run build`, `tsc --noEmit`, `dotnet build`) before finishing.
-2. **No Optional Tooling Bloat**:
-   - Do not spend turns creating `.eslintrc` or `.prettierrc` unless explicitly requested; focus on runnable game code first.
-3. **Non-Blocking QA Commands**:
-   - Never run hanging dev servers (`npm run dev`, `vite`) inside `execute_command` without a timeout or backgrounding; use one-shot build/test commands (`npm run build`, `npx vitest run`).
+## Goal
+Verify every code change with a real build or test run while avoiding wasted tool turns and hanging background processes.
+
+## When to use
+- Reviewing code changes before QA
+- Running build or unit/integration tests in `QAAgent` or `DebuggerAgent`
+
+## Workflow
+1. Run one-shot build/typecheck (`npm run build`, `tsc --noEmit`, `dotnet build`).
+2. Run unit tests (`npx vitest run`, `pytest`, `npm test`) if present.
+3. For web games, verify runtime boot with `browser_console_logs` and `browser_screenshot`.
+
+## Rules
+- Never run blocking dev servers (`npm run dev`, `vite`) inside `execute_command`.
+- Only run `git_diff` when the target game folder is a git repository.
+- Report exact measured errors and file/line numbers; never invent passing results.

@@ -1,14 +1,25 @@
 ---
 name: phaser-vite-ts
-description: Standard scaffold and build checklist for Vite + TypeScript + Phaser 3 games.
+description: Scaffold, configure, and build complete Vite + TypeScript + Phaser 3 games. Use when creating a new Phaser TypeScript project or fixing missing scenes and Vite/TS build errors.
 ---
 
-# Phaser 3 + Vite + TypeScript Skill
+# Phaser Vite + TypeScript Skill
 
-When creating a Vite + TypeScript Phaser 3 project, always create **all** required files before finishing:
+## Goal
+Ensure every Vite + TypeScript + Phaser 3 project compiles cleanly with zero TypeScript errors and boots a playable scene in the browser.
 
-1. **`package.json`**: Include `phaser`, `vite`, and `typescript` with `"build": "tsc --noEmit && vite build"`.
-2. **`tsconfig.json`** & **`src/vite-env.d.ts`**: Include `/// <reference types="vite/client" />` so `import.meta.env` compiles cleanly.
-3. **`index.html`**: Point `<script type="module" src="/src/main.ts"></script>`.
-4. **All Imported Scenes (`src/scenes/`)**: Never import a scene in `src/main.ts` unless its `.ts` file exists (`BootScene.ts`, `GameScene.ts`, `UIScene.ts`).
-5. **Verify Build**: Run `npm install && npm run build` via `execute_command` to confirm 0 TypeScript errors.
+## When to use
+- Creating a new Phaser 3 game with `package.json` + Vite + TypeScript
+- Fixing `Cannot find module './scenes/...'` or `import.meta.env` TypeScript errors
+
+## Workflow
+1. Write `package.json` (`phaser`, `vite`, `typescript`, `"build": "tsc --noEmit && vite build"`).
+2. Write `tsconfig.json` and `src/vite-env.d.ts` (`/// <reference types="vite/client" />`).
+3. Create `index.html` pointing `<script type="module" src="/src/main.ts"></script>`.
+4. Create every scene imported in `src/main.ts` (`BootScene.ts`, `GameScene.ts`, `UIScene.ts`).
+5. Run `npm install && npm run build` via `execute_command` to verify 0 errors.
+
+## Rules
+- Never import a scene in `main.ts` without creating its `.ts` file in `src/scenes/`.
+- Skip optional linting/formatting files (`.eslintrc`, `.prettierrc`) unless explicitly requested.
+- Never run blocking dev servers (`npm run dev`, `vite`) in verification commands; use `npm run build`.

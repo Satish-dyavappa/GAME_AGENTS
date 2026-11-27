@@ -1,19 +1,55 @@
 ---
 name: phaser-performance
-description: Optimize Phaser 3 rendering performance, draw calls, texture atlases, and sprite pooling.
+description: Diagnose and fix FPS drops, lag, and memory issues in Phaser + TypeScript games. Use when the user reports lag, low FPS, stuttering, high draw calls, or poor performance on low-end Android devices.
 ---
 
-# Phaser 3 Performance Skill
+# Phaser Performance Skill
 
-Use these techniques to keep Phaser 3 games running at a locked 60 FPS:
+## Goal
+Find the root cause of a performance problem and propose the smallest
+fix that reaches the target FPS. Do not change gameplay behavior.
 
-1. **Minimize Draw Calls**:
-   - Pack UI icons, tiles, and character frames into a single **Texture Atlas** (`this.load.atlas(...)`) so Phaser batches them into one WebGL draw call.
-   - Avoid mixing `Phaser.GameObjects.Text` excessively between sprites (each dynamic `Text` breaks batching; prefer `BitmapText` for HUD counters).
-2. **Object Pooling**:
-   - Use `this.add.group({ classType: Bullet, maxSize: 100, runChildUpdate: true })` with `get()` and `setActive(false).setVisible(false)` instead of `new` + `destroy()`.
-3. **Avoid Per-Frame Allocations**:
-   - Never call `this.add.*` or `new Phaser.Math.Vector2()` inside `update(time, delta)`.
-4. **References & Helpers**:
-   - Deep-dive batching rules: `references/draw-call-guide.md`
-   - Audit sprite creation in a project: `python scripts/count_sprites.py <project_dir>`
+## When to use
+- Player reports lag or low FPS
+- A level has many enemies, particles, or lights
+- Memory grows over time (possible leak)
+
+## Workflow
+1. Ask for the target: device, FPS goal (default: 60 FPS on low-end Android).
+2. Measure first. Never guess. Check:
+   - Draw calls (`game.renderer.drawCount` or Spector.js)
+   - Active game objects count
+   - Texture memory and atlas usage
+3. Identify the top bottleneck from the checklist below.
+4. Propose ONE fix, explain why, and estimate the gain.
+5. Hand the fix to the Developer Agent. Do not edit code yourself.
+
+## Bottleneck checklist (check in this order)
+1. **Draw calls:** sprites not in a shared texture atlas
+2. **Object count:** enemies/bullets created and destroyed every frame (use object pooling)
+3. **Particles/lights:** too many emitters or per-sprite light effects
+4. **Update loops:** heavy logic inside `update()` every frame
+5. **Memory leaks:** listeners or timers not removed on scene shutdown
+
+## Rules
+- Never remove gameplay features to gain FPS without asking the Game Design Agent.
+- Prefer pooling, batching, and atlases over rewriting systems.
+- If you cannot measure, say so. Do not invent numbers.
+
+## Output format
+Return exactly this structure:
+
+```json
+{
+  "problem": "short description",
+  "evidence": "measured numbers",
+  "root_cause": "one sentence",
+  "fix": "what to change",
+  "expected_gain": "e.g. 300 -> 40 draw calls",
+  "risk": "low | medium | high"
+}
+```
+
+## Reference
+For atlas packing details, read `references/draw-call-guide.md`.
+To count sprites and objects in code, run `scripts/count_sprites.py <project_dir>`.

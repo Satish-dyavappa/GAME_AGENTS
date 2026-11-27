@@ -1,18 +1,27 @@
 ---
 name: game-architecture
-description: Global game architecture principles including state separation, delta-time loops, and object pooling.
+description: Design clean, modular game architecture separating pure rules/state from engine rendering. Use when planning a new game, refactoring monolithic scenes, or designing multi-scene state flow.
 ---
 
 # Game Architecture Skill
 
-Apply these core architectural patterns across all game engines:
+## Goal
+Keep game rules, physics, and state decoupled from rendering so games remain testable, maintainable, and frame-rate independent.
 
-1. **Separate Pure Rules/State from Rendering**:
-   - Keep game rules (board logic, combat math, inventory, turn state) in pure, engine-independent modules (`src/engine/` or `src/systems/`).
-   - Keep rendering, input listeners, and audio inside engine scene/view layers (`src/scenes/` or `src/ui/`).
-2. **Frame-Rate Independent Loops**:
-   - Multiply all movement, cooldowns, and animations by `delta` (seconds or normalized ms).
-3. **Object Pooling**:
-   - Reuse bullets, particles, enemies, and UI popups instead of allocating/destroying them every frame.
-4. **Reference Docs**:
-   - See `references/state-management.md` when designing multi-scene state transitions.
+## When to use
+- Planning a new game project or major feature
+- Refactoring a large scene file where rules and rendering are mixed
+- Designing state sharing across multiple scenes (Boot, Game, UI)
+
+## Workflow
+1. Place pure game rules and data models in `src/engine/` or `src/systems/`.
+2. Place scene lifecycle, sprites, input, and HUD in `src/scenes/` or `src/ui/`.
+3. Connect gameplay scenes to UI scenes via typed events or a shared state store.
+4. Use delta time (`delta`) for all movement, timers, and animations.
+
+## Rules
+- Never couple pure rule validation (chess legality, combat math, inventory) to DOM or canvas objects.
+- Always clean up global event listeners and timers on scene shutdown.
+
+## Reference
+For multi-scene state patterns, read `references/state-management.md`.
